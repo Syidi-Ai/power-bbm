@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>Susun Surah Al-Kāfirūn</title>
+  <style>
+    body {
+      font-family: 'Comic Sans MS', 'Arial', sans-serif;
+      background: linear-gradient(to bottom right, #fdf6e3, #ffe0b2);
+      text-align: center;
+      padding: 20px;
+      color: #2c3e50;
+    }
+    h1 {
+      font-size: 2.5em;
+      color: #d84315;
+      margin-bottom: 10px;
+    }
+    p {
+      font-size: 1.2em;
+      color: #555;
+      margin-bottom: 30px;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      margin: 0 auto;
+      max-width: 600px;
+    }
+
+    .card {
+      width: 100%;
+      padding: 15px;
+      font-size: 1.5em;
+      background: #fff3e0;
+      border: 3px solid #ff9800;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      cursor: grab;
+      direction: rtl;
+      transition: transform 0.2s;
+      position: relative;
+    }
+
+    .card:hover {
+      transform: scale(1.03);
+      background-color: #ffe0b2;
+    }
+
+    .card.dragging {
+      opacity: 0.5;
+      border: 3px dashed #ff5722;
+    }
+
+    .symbol {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      font-size: 1em;
+      color: #ffffff;
+      background-color: #f57c00;
+      padding: 5px 10px;
+      border-radius: 50%;
+      font-weight: bold;
+    }
+
+    button {
+      margin-top: 30px;
+      padding: 12px 24px;
+      font-size: 1.2em;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .result {
+      margin-top: 25px;
+      font-size: 1.5em;
+      font-weight: bold;
+    }
+
+    .emoji {
+      font-size: 2em;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🕌 Susun Surah Al-Kāfirūn</h1>
+<p>Tengok susunan & salin kod simbol (A–F) ikut urutan dalam buku tulis</p>
+
+<div class="container" id="cardContainer">
+  <div class="card" draggable="true" data-id="6" data-symbol="A">
+    <span class="symbol">A</span>
+    لَكُمْ دِينُكُمْ وَلِيَ دِينِ
+  </div>
+  <div class="card" draggable="true" data-id="1" data-symbol="B">
+    <span class="symbol">B</span>
+    قُلْ يَا أَيُّهَا الْكَافِرُونَ
+  </div>
+  <div class="card" draggable="true" data-id="3" data-symbol="C">
+    <span class="symbol">C</span>
+    وَلَا أَنْتُمْ عَابِدُونَ مَا أَعْبُدُ
+  </div>
+  <div class="card" draggable="true" data-id="4" data-symbol="D">
+    <span class="symbol">D</span>
+    وَلَا أَنَا عَابِدٌ مَا عَبَدتُّمْ
+  </div>
+  <div class="card" draggable="true" data-id="5" data-symbol="E">
+    <span class="symbol">E</span>
+    وَلَا أَنتُمْ عَابِدُونَ مَا أَعْبُدُ
+  </div>
+  <div class="card" draggable="true" data-id="2" data-symbol="F">
+    <span class="symbol">F</span>
+    لَا أَعْبُدُ مَا تَعْبُدُونَ
+  </div>
+</div>
+
+<button onclick="checkOrder()">✅ Semak Susunan</button>
+<div class="result" id="result"></div>
+
+<script>
+  const correctOrder = ["B", "F", "C", "D", "E", "A"];
+
+  const container = document.getElementById('cardContainer');
+  let draggingEle;
+
+  container.addEventListener('dragstart', e => {
+    if (e.target.classList.contains('card')) {
+      draggingEle = e.target;
+      e.target.classList.add('dragging');
+    }
+  });
+
+  container.addEventListener('dragend', e => {
+    if (draggingEle) {
+      draggingEle.classList.remove('dragging');
+      draggingEle = null;
+    }
+  });
+
+  container.addEventListener('dragover', e => {
+    e.preventDefault();
+    const afterElement = getDragAfterElement(container, e.clientY);
+    if (afterElement == null) {
+      container.appendChild(draggingEle);
+    } else {
+      container.insertBefore(draggingEle, afterElement);
+    }
+  });
+
+  function getDragAfterElement(container, y) {
+    const elements = [...container.querySelectorAll('.card:not(.dragging)')];
+    return elements.reduce((closest, child) => {
+      const box = child.getBoundingClientRect();
+      const offset = y - box.top - box.height / 2;
+      if (offset < 0 && offset > closest.offset) {
+        return { offset, element: child };
+      } else {
+        return closest;
+      }
+    }, { offset: Number.NEGATIVE_INFINITY }).element;
+  }
+
+  function checkOrder() {
+    const cards = document.querySelectorAll('.card');
+    const userOrder = [...cards].map(card => card.dataset.symbol);
+    const result = document.getElementById('result');
+    if (JSON.stringify(userOrder) === JSON.stringify(correctOrder)) {
+      result.innerHTML = "<span class='emoji'>🎉</span> <span style='color:green'>Betul! Hebat!</span>";
+    } else {
+      result.innerHTML = "<span class='emoji'>❌</span> <span style='color:red'>Susunan belum betul. Cuba salin semula kod simbol dengan betul!</span>";
+    }
+  }
+</script>
+
+</body>
+</html>
